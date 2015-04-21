@@ -6,17 +6,14 @@ module Moon
 
         def check_array_type(type, key, value, options = {})
           check_object_class(key, Array, value, options)
-          true
         end
 
         def check_hash_type(type, key, value, options = {})
           check_object_class(key, Hash, value, options)
-          true
         end
 
         def check_normal_type(type, key, value, options = {})
           check_object_class(key, type, value, options)
-          true
         end
 
         def check_type(type, key, value, options = {})
