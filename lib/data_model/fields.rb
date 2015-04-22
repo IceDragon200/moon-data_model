@@ -196,7 +196,9 @@ module Moon
           end
         end
 
-        ##
+        # @yieldparam [Symbol] key
+        # @yieldparam [Field] field
+        #
         # @example
         #   each_field do |key, field|
         #   end
@@ -205,6 +207,8 @@ module Moon
           self.class.each_field.each(&block)
         end
 
+        # @yieldparam [Symbol] key
+        #
         # @example
         #   each_field_name do |key|
         #   end
@@ -216,6 +220,10 @@ module Moon
         end
         alias :each_key :each_field_name
 
+        # @yieldparam [Symbol] key
+        # @yieldparam [Field] field
+        # @yieldparam [Object] value
+        #
         # @example
         #   each_field_with_value do |key, field, value|
         #   end
@@ -226,15 +234,34 @@ module Moon
           end
         end
 
-        ##
+        # @yieldparam [Symbol] key
+        # @yieldparam [Objecy] value
+        #
         # @example
-        #   each do |key, value|
+        #   each_pair do |key, value|
         #   end
-        def each
-          return to_enum :each unless block_given?
+        def each_pair
+          return to_enum :each_pair unless block_given?
           each_field_with_value do |key, _, value|
             yield key, value
           end
+        end
+
+        # @yieldparam [Object] value
+        #
+        # @example
+        #   each_value do |value|
+        #   end
+        def each_value
+          return to_enum :each_value unless block_given?
+          each_field_with_value do |_, _, value|
+            yield value
+          end
+        end
+
+        # (see #each_pair)
+        def each(&block)
+          each_pair(&block)
         end
 
         # @return [Boolean]
