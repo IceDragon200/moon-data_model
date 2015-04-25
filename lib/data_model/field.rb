@@ -11,12 +11,17 @@ module Moon
       attr_reader :default
       # @return [Boolean] allow_nil  are nils allowed for the value?
       attr_reader :allow_nil
+      # @return [Boolean] is_key  Is this a key field (such as an id)?
+      attr_reader :is_key
 
       def initialize(options)
         @type      = options.fetch(:type)
         @default   = options.fetch(:default, nil)
         @allow_nil = options.fetch(:allow_nil, false)
+        @is_key    = options.fetch(:is_key, false)
       end
+
+      alias :is_key? :is_key
 
       def type_validator
         self.class.type_validator
