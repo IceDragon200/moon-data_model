@@ -13,9 +13,9 @@ module Moon
       attr_reader :allow_nil
 
       def initialize(options)
-        @type = options.fetch(:type)
-        @default = options[:default]
-        @allow_nil = !!options[:allow_nil]
+        @type      = options.fetch(:type)
+        @default   = options.fetch(:default, nil)
+        @allow_nil = options.fetch(:allow_nil, false)
       end
 
       def type_validator
