@@ -1,0 +1,14 @@
+language: ruby
+#addons:
+#  code_climate:
+#    repo_token: 1aa9df8aaf02075a819e9b0006a0c60b8da050fe1b7cf34eb0ce68aafe9c6583
+rvm:
+- 2.1
+- 2.2
+- ruby-head
+before_install:
+- gem install bundle
+install:
+- bundle install
+script:
+- bundle exec rspec -r ./spec/spec_helper.rb
