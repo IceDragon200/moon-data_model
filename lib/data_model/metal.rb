@@ -17,54 +17,14 @@ module Moon
       #   Values to initialize the model with
       def initialize(opts = {})
         @dmid = @@dmid += 1
-
-        # Some subclasses may overload the set method, so an internal
-        # _dm_set_ method was created.
-        _dm_set_(opts)
-        initialize_fields(opts.keys)
-
+        initialize_fields(opts)
         yield self if block_given?
-
         post_init
       end
 
       # Final initialization method
       private def post_init
         #
-      end
-
-      # @param [Array<Symbol>] dont_init
-      #   A list of keys not to initialize
-      private def initialize_fields(dont_init = [])
-        each_field_name do |k|
-          next if dont_init.any? { |s| s.to_s == k.to_s }
-          begin
-            init_field(k)
-          rescue => ex
-            puts "Error occured while initialiing field: #{k}"
-            raise ex
-          end
-        end
-      end
-
-      # Set internal attributes using the hash key~value pairs.
-      # These attributes are subject to validation, use #set! instead if
-      # validation needs to be bypassed.
-      #
-      # @param [Hash<Symbol, Object>] opts
-      def set(opts)
-        opts.each { |k, v| self.send("#{k}=", v) }
-        self
-      end
-
-      # Sets internal attributes using the Hash key~value pairs.
-      # These attributes bypass validation, use #set instead if validation is
-      # needed.
-      #
-      # @param [Hash<Symbol, Object>] opts
-      def set!(opts)
-        opts.each { |k, v| send("_#{k}_set", v) }
-        self
       end
 
       # Converts to a Hash
@@ -127,12 +87,6 @@ module Moon
       private def custom_type_cast(key, value)
         raise "#{key}, #{value}"
       end
-
-      alias :_dm_set_ :set
-      alias :_dm_set_! :set!
-
-      private :_dm_set_
-      private :_dm_set_!
     end
   end
 end

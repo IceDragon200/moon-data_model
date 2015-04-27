@@ -30,16 +30,33 @@ module Moon
         self.class.type_validator
       end
 
-      def type_class(type = @type)
-        if type.is_a?(Hash)
+      # Determines to real type of the internal type,
+      # in the case of Array notations or Hash notations.
+      #
+      # @param [Object] obj
+      # @return [Class]
+      def determine_type_class(obj)
+        if obj.is_a?(Hash)
           Hash
-        elsif type.is_a?(Array)
+        elsif obj.is_a?(Array)
           Array
+        elsif obj.is_a?(String)
+          Object.const_get(obj)
         else
-          type
+          obj
         end
       end
 
+      # (see #determine_type_class)
+      def type_class
+        determine_type_class(@type)
+      end
+
+      # @param [Object] obj
+      # @return [Object]
+      def coerce(obj)
+        type_class.respond_to?(:coerce) ? type_class.coerce(obj) : obj
+      end
 
       def make_default(model = nil)
         @default.is_a?(Proc) ? @default.call(@type, model) : @default
