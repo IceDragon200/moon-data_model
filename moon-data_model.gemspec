@@ -14,9 +14,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency             'rake',          '~> 10.3'
   s.add_dependency             'activesupport', '~> 4.2'
-  s.add_dependency             'moon-packages', '~> 0.0'  # this is only temporary until the other packages are seperated
-  s.add_development_dependency 'rubocop', '~> 0.27'
-  s.add_development_dependency 'guard',   '~> 2.8'
+  s.add_dependency             'moon-packages', '~> 0.0'
   s.add_development_dependency 'yard',    '~> 0.8'
   s.add_development_dependency 'rspec',   '~> 3.2'
   s.add_development_dependency 'codeclimate-test-reporter'
