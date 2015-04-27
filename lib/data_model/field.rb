@@ -5,6 +5,8 @@ module Moon
         attr_accessor :type_validator
       end
 
+      # @return [Symbol] name of the field
+      attr_reader :name
       # @return [Array, Hash, Class] type
       attr_reader :type
       # @return [Proc, Object] default
@@ -15,6 +17,7 @@ module Moon
       attr_reader :is_key
 
       def initialize(options)
+        @name      = options.fetch(:name)
         @type      = options.fetch(:type)
         @default   = options.fetch(:default, nil)
         @allow_nil = options.fetch(:allow_nil, false)
@@ -36,6 +39,7 @@ module Moon
           type
         end
       end
+
 
       def make_default(model = nil)
         @default.is_a?(Proc) ? @default.call(@type, model) : @default
