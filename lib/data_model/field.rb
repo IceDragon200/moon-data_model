@@ -48,12 +48,16 @@ module Moon
 
       # @param [Object] type
       # @return [void]
+      #
+      # @api private
       private def initialize_type(type)
         @type = Moon::DataModel::Type[type]
       end
 
       # @param [Hash<Symbol, Object>] validators
       # @return [void]
+      #
+      # @api private
       private def initialize_validators(validators)
         @validators = []
 
@@ -64,24 +68,58 @@ module Moon
         end
       end
 
+      # Attempts to convert the provided value to the Field's type
+      #
+      # @param [Object] value
+      # @return [Object] coerced value, may return the value given.
+      #
+      # @api public
       def coerce(value)
         @type.coerce(value)
       end
 
+      # Returns the default value for the field, a model must be provided
+      # if the default is a Proc and not a value.
+      #
+      # @return [Object]
+      #
+      # @api public
       def make_default(model = nil)
         @default.is_a?(Proc) ? @default.call(@type, model) : @default
       end
 
-      def run_validators(value, quiet = false)
+      # Invokes each validator on the provided value, if the value
+      # fails validation, the Validator +may+ raise an error.
+      #
+      # @param [Object] value
+      # @return [void]
+      #
+      # @api private
+      private def run_validators(value, quiet = false)
         @validators.each do |validator|
           validator.validate(value)
         end
       end
 
+      # (see #run_validators)
       def validate(value, quiet = false)
         run_validators(value, quiet)
       end
 
+      # Generic field `default` proc.
+      # The best way to use this is to use it as a general field_setting
+      #
+      # @return [Proc]
+      #
+      # @example
+      #   # as a single line
+      #   field :my_model, type: MyModel, default: Moon::DataModel::Field.default_proc
+      #   # as a field_setting, all fields inside the block will get the default
+      #   field_settings default: Moon::DataModel::Field.default_proc do
+      #     field :id, type: String
+      #     field :a, type: Integer
+      #     field :a_model, type: AModel
+      #   end
       def self.default_proc
         lambda do |type, _|
           # Integer, Numeric and Float cannot be created using .new

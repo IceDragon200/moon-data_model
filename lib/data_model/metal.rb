@@ -7,17 +7,21 @@ module Moon
     class Metal
       include Model
 
-      # @return [Integer] DataModel id counter
+      # @return [Integer] Global DataModel id, incremented each time a Metal
+      #                   based model is created.
       @@dmid = 0
 
-      # @return [Integer] Generic DataModel id
+      # @!attribute [r] dmid
+      #   @return [Integer] Generic DataModel id
       attr_reader :dmid
 
-      # @param [Hash<Symbol, Object>] opts
-      #   Values to initialize the model with
-      def initialize(opts = {})
+      # @param [Hash<Symbol, Object>] options
+      #   Values to initialize the model with, each Key value pair should be
+      #   a field name and value for the field to initialize with.
+      # see also {Fields::InstanceMethods#initialize_fields}
+      def initialize(options = {})
         @dmid = @@dmid += 1
-        initialize_fields(opts)
+        initialize_fields(options)
         yield self if block_given?
         post_init
       end
@@ -27,7 +31,8 @@ module Moon
         #
       end
 
-      # Converts to a Hash
+      # Converts the Model to a Hash, all fields will be converted to Hashes
+      # via #to_h
       #
       # @return [Hash<Symbol, Object>]
       def to_h

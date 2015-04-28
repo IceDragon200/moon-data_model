@@ -3,9 +3,19 @@ require 'data_model/err'
 module Moon
   module DataModel
     class Type
+      # @!attribute [r] model
+      #   @return [Module] the main class of the type
       attr_reader :model
+      # @!attribute [r] content
+      #   @return [Hash, Array, nil] depending on the model
       attr_reader :content
 
+      # @param [Module] model
+      # @param [Object] content
+      # @param [Hash] options
+      # @option options [Boolean] :array
+      # @option options [Boolean] :hash
+      # @option options [Boolean] :incomplete
       def initialize(model, content = nil, options = {})
         @model = model
         @content = content.presence
@@ -28,18 +38,28 @@ module Moon
 
       # Checks if the Type has been completed, if not raises an IncompleteType
       # error.
+      # @api private
       def check_complete
         raise IncompleteType, "incomplete type #{@model}" if @incomplete
       end
 
+      # Is this Type an Array?
+      #
+      # @return [Boolean]
       def array?
         @array
       end
 
+      # Is this Type a Hash/Map/Dict?
+      #
+      # @return [Boolean]
       def hash?
         @hash
       end
 
+      # Is this Type incomplete?
+      #
+      # @return [Boolean]
       def incomplete?
         @incomplete
       end
