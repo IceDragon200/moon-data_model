@@ -1,35 +1,35 @@
 require 'spec_helper'
 require 'data_model/load'
 
-module Fixtures
-  class MetalTest < Moon::DataModel::Metal
-    field :id, type: String, default: proc { 'GIMME_AN_ID' }
+describe Moon::DataModel::Metal do
+  context '.fields' do
+    it 'should have correct fields' do
+      id_field = Fixtures::MetalTest.fetch_field(:id)
+      expect(id_field.type).to eq(Moon::DataModel::Type[String])
+    end
   end
 
-  class SubModelTest < Moon::DataModel::Metal
-    field :name, type: String
-    field :metal, type: MetalTest
+  context '.fetch_field' do
+    it 'should fetch an existing field' do
+      field = Fixtures::ModelTest.fetch_field(:a)
+      expect(field.name).to eq(:a)
+      expect(field.type).to equal(Moon::DataModel::Type[String])
+    end
   end
-end
 
-describe Fixtures::MetalTest do
   context '#initialize' do
     it 'should initialize and set default fields' do
-      obj = described_class.new
+      obj = Fixtures::MetalTest.new
       expect(obj.id).to eq('GIMME_AN_ID')
     end
 
     it 'should initialize given a hash' do
-      obj = described_class.new(id: '123abc')
+      obj = Fixtures::MetalTest.new(id: '123abc')
       expect(obj.id).to eq('123abc')
     end
-  end
-end
 
-describe Fixtures::SubModelTest do
-  context '#initialize' do
     it 'should initialize sub models from hashes' do
-      obj = described_class.new(name: 'Awesome', metal: { id: 'ABC123' })
+      obj = Fixtures::SubModelTest.new(name: 'Awesome', metal: { id: 'ABC123' })
       expect(obj.name).to eq('Awesome')
       expect(obj.metal.id).to eq('ABC123')
     end
