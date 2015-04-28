@@ -1,5 +1,6 @@
 require 'std/mixins/serializable'
 require 'std/mixins/prototype'
+require 'std/core_ext/array'
 require 'data_model/err'
 require 'data_model/field'
 
@@ -448,13 +449,13 @@ module Moon
 
         # Checks if all fields are valid, returns a list of invalid fields
         #
-        # @return [Array<Symbol>] key
+        # @return [Array<Symbol>, nil] key
         def valid?
           invalid = []
           each_field_with_value do |key, field, value|
             invalid << key unless field.valid?(value)
           end
-          invalid
+          invalid.presence
         end
 
         # Runs the validation for each field on the model.
