@@ -21,13 +21,26 @@ module Moon
       # see also {Fields::InstanceMethods#initialize_fields}
       def initialize(options = {})
         @dmid = @@dmid += 1
+        pre_initialize
         initialize_fields(options)
         yield self if block_given?
-        post_init
+        post_initialize
       end
 
-      # Final initialization method
-      private def post_init
+      # Pre initialization method, use this as a way to setup the model
+      # before its fields are initialized
+      #
+      # @return [void]
+      private def pre_initialize
+      end
+
+      # Final initialization method, use this as your own initialize method.
+      # Called after the fields have been initialized at the very end.
+      # if you need to change the model before it ever reaches the user
+      # use {Fields#post_initialize_fields} instead.
+      #
+      # @return [void]
+      private def post_initialize
         #
       end
 
