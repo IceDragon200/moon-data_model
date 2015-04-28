@@ -1,48 +1,53 @@
+require 'data_model/type_validators/base'
+require 'data_model/err'
+
 module Moon
   module DataModel
     module TypeValidators
       module Verbose
         include Moon::DataModel::TypeValidators::Soft
 
-        def check_array_content(type, key, value, options = {})
+        def check_array_content(type, value, options = {})
+          content_type = type.content.map { |k| Moon::DataModel::Type[k] }
           value.each_with_index do |obj, i|
-            unless type.any? { |t| check_type(t, key, obj, quiet: true, allow_nil: false) }
-              str = type.map { |s| s.inspect }.join(", ")
+            unless content_type.any? { |t| check_type(t, obj, quiet: true, allow_nil: false) }
+              str = content_type.map { |s| s.inspect }.join(", ")
               if options[:quiet]
                 return false
               else
-                raise TypeError,
-                      "[#{key}[#{i}]] wrong content type #{obj.class.inspect} (expected #{str})"
+                raise TypeValidationError,
+                      "[#{i}] wrong content type #{obj.class.inspect} (expected #{str})"
               end
             end
           end
           true
         end
 
-        def check_array_type(type, key, value, options = {})
-          check_object_class(key, Array, value, options)
-          check_array_content(type, key, value, options)
+        def check_array_type(type, value, options = {})
+          check_object_class(type.model, value, options)
+          check_array_content(type, value, options)
         end
 
-        def check_hash_content(type, key, value, options = {})
-          key_types = type.keys
-          key_str = type.map { |s| s.inspect }.join(", ")
+        def check_hash_content(type, value, options = {})
+          content_type = type.content
+          key_types = content_type.keys
+          key_str = content_type.map { |s| s.inspect }.join(", ")
           value.each do |k, v|
-            unless type.key?(k.class)
+            unless content_type.key?(k.class)
               if options[:quiet]
                 return false
               else
-                raise TypeError, "[#{key}] wrong Hash key (#{k}) of type #{k.class.inspect} (expected #{key_str})"
+                raise TypeValidationError, "wrong Hash key (#{k}) of type #{k.class.inspect} (expected #{key_str})"
               end
             end
-            value_type = type[k.class]
-            check_type(value_type, "#{key}[#{k.inspect}]", v, options)
+            value_type = Moon::DataModel::Type[content_type[k.class]]
+            check_type(value_type, v, options)
           end
         end
 
-        def check_hash_type(type, key, value, options = {})
-          check_object_class(key, Hash, value, options)
-          check_hash_content(type, key, value, options)
+        def check_hash_type(type, value, options = {})
+          check_object_class(type.model, value, options)
+          check_hash_content(type, value, options)
         end
 
         private :check_hash_content

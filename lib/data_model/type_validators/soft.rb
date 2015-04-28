@@ -1,43 +1,46 @@
+require 'data_model/type_validators/base'
+require 'data_model/err'
+
 module Moon
   module DataModel
     module TypeValidators
       module Soft
         include Moon::DataModel::TypeValidators::Base
 
-        def check_array_type(type, key, value, options = {})
-          check_object_class(key, Array, value, options)
+        def check_array_type(type, value, options = {})
+          check_object_class(type.model, value, options)
         end
 
-        def check_hash_type(type, key, value, options = {})
-          check_object_class(key, Hash, value, options)
+        def check_hash_type(type, value, options = {})
+          check_object_class(type.model, value, options)
         end
 
-        def check_normal_type(type, key, value, options = {})
-          check_object_class(key, type, value, options)
+        def check_normal_type(type, value, options = {})
+          check_object_class(type.model, value, options)
         end
 
-        def check_type(type, key, value, options = {})
-          if options[:allow_nil] && value.nil?
-            return true
-          elsif !options[:allow_nil] && value.nil?
-            if options[:quiet]
+        def do_check(type, value, options = {})
+          if value.nil?
+            if options[:allow_nil]
+              return true
+            elsif options[:quiet]
               return false
             else
-              raise TypeError, ":#{key} shall not be nil (expects #{type})"
+              raise ArgumentError, "cannot be nil (expects #{type})"
             end
           end
+
           # validate that obj is an Array and contains correct types
-          case type
-          when Array
-            check_array_type(type, key, value, options)
+          if type.model == Array
+            check_array_type(type, value, options)
           # validate that value is a Hash of key type and value type
-          when Hash
-            check_hash_type(type, key, value, options)
+          elsif type.model == Hash
+            check_hash_type(type, value, options)
           # validate that value is of type
-          when Module
-            check_normal_type(type, key, value, options)
+          elsif type.model.is_a?(Module)
+            check_normal_type(type, value, options)
           else
-            true
+            raise InvalidType, "cannot handle #{type.model}"
           end
         end
 
