@@ -31,16 +31,8 @@ module Moon
       #
       # @return [Hash<Symbol, Object>]
       def to_h
-        fields_hash
-      end
-
-      # A recursive method of #to_h
-      #
-      # @return [Hash<Symbol, Object>]
-      def to_h_r
         hsh = {}
-        each_field_name do |k|
-          obj = send(k)
+        each_pair do |k, obj|
           if obj.is_a?(Array)
             obj = obj.map do |o|
               o.respond_to?(:to_h) ? o.to_h : o
@@ -56,29 +48,6 @@ module Moon
           hsh[k] = obj
         end
         hsh
-      end
-
-      # Force the type conversion of each field, if a particular type
-      # cannot be converted immediately, #custom_type_cast is called
-      #
-      # @return [self]
-      def force_types
-        each_field do |k, field|
-          value = self[k]
-          type = field.type_class
-          next if value.nil? && field.allow_nil?
-          next if value.is_a?(type)
-          self[k] =
-          if type == Array      then value.to_a
-          elsif type == Float   then value.to_f
-          elsif type == Hash    then value.to_h
-          elsif type == Integer then value.to_i
-          elsif type == String  then value.to_s
-          else
-            custom_type_cast(k, value)
-          end
-        end
-        self
       end
 
       # @param [Symbol] key
