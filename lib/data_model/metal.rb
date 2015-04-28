@@ -56,8 +56,8 @@ module Moon
             end
           elsif obj.is_a?(Hash)
             obj = obj.each_with_object({}) do |a, hash|
-              k, v = a
-              hash[k] = v.respond_to?(:to_h) ? v.to_h : v
+              hk, hv = *a
+              hash[hk] = hv.respond_to?(:to_h) ? hv.to_h : hv
             end
           else
             obj = obj.to_h if obj.respond_to?(:to_h)
