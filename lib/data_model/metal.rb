@@ -28,20 +28,19 @@ module Moon
       end
 
       # Pre initialization method, use this as a way to setup the model
-      # before its fields are initialized
+      # before its fields are initialized.
       #
       # @return [void]
-      private def pre_initialize
+      def pre_initialize
       end
 
       # Final initialization method, use this as your own initialize method.
       # Called after the fields have been initialized at the very end.
       # if you need to change the model before it ever reaches the user
-      # use {Fields#post_initialize_fields} instead.
+      # use {Fields::InstanceMethods#post_initialize_fields} instead.
       #
       # @return [void]
-      private def post_initialize
-        #
+      def post_initialize
       end
 
       # Converts the Model to a Hash, all fields will be converted to Hashes
@@ -66,13 +65,6 @@ module Moon
           hsh[k] = obj
         end
         hsh
-      end
-
-      # @param [Symbol] key
-      # @param [Object] value
-      # @return [Object]
-      private def custom_type_cast(key, value)
-        raise "#{key}, #{value}"
       end
     end
   end

@@ -5,6 +5,7 @@ require 'data_model/field'
 
 module Moon
   module DataModel
+    # The backbone of DataModel's overall system
     module Fields
       # Patches the provided options hash.
       #
@@ -36,6 +37,7 @@ module Moon
         options
       end
 
+      # Methods for setting up, and finding fields on a Model class.
       module Modelling
         include Serializable::Properties::ClassMethods
 
@@ -201,6 +203,7 @@ module Moon
         end
       end
 
+      # Methods associated with converting objects to Models
       module ModelCoercion
         # All models are automatically coercable
 
@@ -220,26 +223,32 @@ module Moon
         end
       end
 
+      # All class methods for {Fields}
       module ClassMethods
         include Modelling
         include ModelCoercion
       end
 
+      # Instance methods for models
       module InstanceMethods
         include Serializable::Properties::InstanceMethods
         # this allows Fields to behave like Hashes :)
         include Enumerable
 
-        ##
-        # @param [Symbol] key
-        private def reset_field(key)
+        # Initializes a field to its default value
+        #
+        # @param [Symbol] key  name of the field to initialize
+        # @return [void]
+        def reset_field(key)
           field = self.class.fetch_field(key)
           field_set key, field.make_default(self)
         end
 
-        ##
-        # Initializes all available fields for the model
-        private def reset_fields
+        # Initializes all available fields for the model with their default
+        # value
+        #
+        # @return [void]
+        def reset_fields
           each_field_name do |key|
             reset_field(key)
           end
@@ -247,6 +256,7 @@ module Moon
 
         # @param [Array<Symbol>] dont_init
         #   A list of fields not to initialize
+        # @return [void]
         private def initialize_fields_default(dont_init = [])
           each_field_name do |k|
             next if dont_init.any? { |s| s.to_s == k.to_s }
@@ -255,7 +265,7 @@ module Moon
         end
 
         # Callback before fields are initialized by given options
-        # and defaults
+        # and defaults.
         def pre_initialize_fields
         end
 
@@ -274,6 +284,8 @@ module Moon
           post_initialize_fields
         end
 
+        # Sets a field value by key, the value will be coerced
+        #
         # @param [Symbol] key
         # @param [Object] value
         # @return [void]
@@ -282,6 +294,10 @@ module Moon
           send "#{key}=", field.coerce(value)
         end
 
+        # Hard sets a field value by key, the value will bypass validations
+        # and coercion.
+        # WARNING: Only use this method if you know what you're doing.
+        #
         # @param [Symbol] key
         # @param [Object] value
         # @return [void]
@@ -289,6 +305,8 @@ module Moon
           send "_#{key}_set", value
         end
 
+        # Retrieves a field value by key
+        #
         # @param [Symbol] key
         # @return [Object]
         def field_get(key)
@@ -317,11 +335,16 @@ module Moon
           self
         end
 
-        # @return [Array[Symbol, Object]]
+        # Create and return an assoc pair, the first element is the field name
+        # and the second if the value of the field.
+        #
+        # @return [Array[Symbol, Object]] name, value
         def assoc(key)
           [key, field_get(key)]
         end
 
+        # Yields each Field
+        #
         # @yieldparam [Symbol] key
         # @yieldparam [Field] field
         #
@@ -333,6 +356,8 @@ module Moon
           self.class.each_field.each(&block)
         end
 
+        # Yields each {Field#name}
+        #
         # @yieldparam [Symbol] key
         #
         # @example
@@ -346,6 +371,8 @@ module Moon
         end
         alias :each_key :each_field_name
 
+        # Yields each Field, along with its current value on the Model.
+        #
         # @yieldparam [Symbol] key
         # @yieldparam [Field] field
         # @yieldparam [Object] value
@@ -360,6 +387,8 @@ module Moon
           end
         end
 
+        # Yields each {Field#name} and value
+        #
         # @yieldparam [Symbol] key
         # @yieldparam [Objecy] value
         #
@@ -373,6 +402,8 @@ module Moon
           end
         end
 
+        # Yields each Field's value
+        #
         # @yieldparam [Object] value
         #
         # @example
@@ -390,32 +421,48 @@ module Moon
           each_pair(&block)
         end
 
-        # @return [Boolean]
+        # Should fields be validated?
+        # see also {Field#validate}
+        #
+        # @return [Boolean] by default, this method always returns true
         def validate_fields?
           true
         end
 
+        # Returns a Hash of all the fields key and value
+        #
         # @return [Hash<Symbol, Object>]
         def fields_hash
           each_field_name.each_with_object({}) { |p, r| r[p[0]] = p[1] }
         end
 
-        # @return [Hash<Symbol, Object>]
+        # (see #fields_hash)
         def fields
           fields_hash
         end
 
-        # @param [Hash<Symbol, Object>] options
-        def fields=(options)
-          update_fields(options)
+        # (see #update_fields)
+        def fields=(opts)
+          update_fields(opts)
+        end
+
+        # Checks if all fields are valid, returns a list of invalid fields
+        #
+        # @return [Array<Symbol>] key
+        def valid?
+          invalid = []
+          each_field_with_value do |key, field, value|
+            invalid << key unless field.valid?(value)
+          end
+          invalid
         end
 
         # Runs the validation for each field on the model.
         #
         # @return [self]
         def validate
-          each_field do |key, field|
-            field.check_type(key, field_get(key))
+          each_field_with_value do |key, field, value|
+            field.validate(value)
           end
           self
         end

@@ -3,6 +3,7 @@ require 'data_model/validators'
 
 module Moon
   module DataModel
+    # Object for storing information about a Field on a model
     class Field
       # @return [Symbol] name of the field
       attr_reader :name
@@ -35,10 +36,10 @@ module Moon
         @default    = options.fetch(:default, nil)
         @allow_nil  = options.fetch(:allow_nil, false)
         @is_key     = options.fetch(:is_key, false)
-        initialize_validators(options.fetch(:validate, []))
+        initialize_validators(options.fetch(:validate, {}))
       end
 
-      # Finalizes the type, this will replace the current field with the
+      # Finalizes the type, this will replace the current {Field#type} with the
       # finalized version. see also {Type#finalize}
       #
       # @return [void]
@@ -50,19 +51,26 @@ module Moon
       # @return [void]
       #
       # @api private
-      private def initialize_type(type)
+      def initialize_type(type)
         @type = Moon::DataModel::Type[type]
       end
 
-      # @param [Hash<Symbol, Object>] validators
+      # Creates validators from the given options, also appends a
+      # Validators::Type if none is given.
+      #
+      # @param [Hash<Symbol, Object>] options
       # @return [void]
       #
       # @api private
-      private def initialize_validators(validators)
+      def initialize_validators(options)
         @validators = []
 
-        v = validators.find { |v| v.is_a?(Validators::Type) }
-        unless v
+        options.each_pair do |key, opts|
+          @validators << Validators.fetch(key).new(opts)
+        end
+
+        # if the @validators already includes a Type validator, just skip this.
+        unless options.find { |v| v.is_a?(Validators::Type) }
           type_validator = Validators.fetch(:type).new(type: @type)
           @validators = [type_validator].concat(@validators)
         end
@@ -88,22 +96,27 @@ module Moon
         @default.is_a?(Proc) ? @default.call(@type, model) : @default
       end
 
+      # Checks that the given value is valid for the field.
+      #
+      # @param [Object] value
+      # @return [Boolean]
+      def valid?(value)
+        @validators.each do |validator|
+          validator.valid?(value)
+        end
+      end
+
       # Invokes each validator on the provided value, if the value
       # fails validation, the Validator +may+ raise an error.
       #
       # @param [Object] value
       # @return [void]
       #
-      # @api private
-      private def run_validators(value, quiet = false)
+      # @api public
+      def validate(value, quiet = false)
         @validators.each do |validator|
           validator.validate(value)
         end
-      end
-
-      # (see #run_validators)
-      def validate(value, quiet = false)
-        run_validators(value, quiet)
       end
 
       # Generic field `default` proc.

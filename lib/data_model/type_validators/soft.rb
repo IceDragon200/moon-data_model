@@ -4,22 +4,45 @@ require 'data_model/err'
 module Moon
   module DataModel
     module TypeValidators
+      # A simple TypeValidator which will only ensure that the provided
+      # value matches its Type's model, content is not checked
+      # Use {Verbose} instead if you need it to check content.
+      # This is the default validator.
       module Soft
         include Moon::DataModel::TypeValidators::Base
 
-        def check_array_type(type, value, options = {})
+        # @param [Type] type
+        # @param [Object] value
+        # @param [Hash] options
+        #   (see Base#check_object_class)
+        # @return [Boolean]
+        protected def check_array_type(type, value, options = {})
           check_object_class(type.model, value, options)
         end
 
-        def check_hash_type(type, value, options = {})
+        # @param [Type] type
+        # @param [Object] value
+        # @param [Hash] options
+        #   (see Base#check_object_class)
+        # @return [Boolean]
+        protected def check_hash_type(type, value, options = {})
           check_object_class(type.model, value, options)
         end
 
-        def check_normal_type(type, value, options = {})
+        # @param [Type] type
+        # @param [Object] value
+        # @param [Hash] options
+        #   (see Base#check_object_class)
+        # @return [Boolean]
+        protected def check_normal_type(type, value, options = {})
           check_object_class(type.model, value, options)
         end
 
-        def do_check(type, value, options = {})
+        # @param [Type] type
+        # @param [Object] value
+        # @param [Hash] options
+        # @return [Boolean]
+        protected def do_check(type, value, options = {})
           if value.nil?
             if options[:allow_nil]
               return true
@@ -43,10 +66,6 @@ module Moon
             raise InvalidType, "cannot handle #{type.model}"
           end
         end
-
-        private :check_hash_type
-        private :check_array_type
-        private :check_normal_type
 
         extend self
       end

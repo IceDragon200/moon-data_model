@@ -2,6 +2,7 @@ require 'data_model/err'
 
 module Moon
   module DataModel
+    # Class for representing Object types
     class Type
       # @!attribute [r] model
       #   @return [Module] the main class of the type
@@ -16,6 +17,7 @@ module Moon
       # @option options [Boolean] :array
       # @option options [Boolean] :hash
       # @option options [Boolean] :incomplete
+      # @api private
       def initialize(model, content = nil, options = {})
         @model = model
         @content = content.presence
