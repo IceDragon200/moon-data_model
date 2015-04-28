@@ -42,6 +42,15 @@ module Moon
         prototype_attr :field, default: proc { {} }
         prototype_attr :field_setting, default: proc { {} }
 
+        # Finalizes incomplete fields
+        #
+        # @return [void]
+        def finalize
+          fields.each do |_, field|
+            field.finalize
+          end
+        end
+
         # Locates a field by name
         #
         # @param [Symbol] expected_key  expected field name
@@ -76,12 +85,12 @@ module Moon
         #   Sets value at key
         #   @param [Symbol] key
         #   @param [Object] value
-        #   @return [Void]
+        #   @return [void]
         #
         # @overload field_setting(options)
         #   Merges the options into the field settings
         #   @param [Hash] options
-        #   @return [Void]
+        #   @return [void]
         def field_setting(obj, *args)
           # allows you to temporarily apply the field_settings to the block.
           if block_given?
@@ -109,7 +118,7 @@ module Moon
           setter = "_#{name}_set"
           alias_method setter, "#{name}="
           define_method "#{name}=" do |obj|
-            field.check_type(name, obj) if validate_fields?
+            field.validate(obj) if validate_fields?
             send setter, obj
           end
         end
@@ -204,12 +213,7 @@ module Moon
         private def initialize_fields_default(dont_init = [])
           each_field_name do |k|
             next if dont_init.any? { |s| s.to_s == k.to_s }
-            begin
-              reset_field(k)
-            rescue => ex
-              puts "Error occured while initialiing field: #{k}"
-              raise ex
-            end
+            reset_field(k)
           end
         end
 
@@ -225,7 +229,7 @@ module Moon
         # Called by the constructor to setup initial fields values
         #
         # @param [Hash<Symbol, Object>] options
-        # @return [Void]
+        # @return [void]
         def initialize_fields(options = {})
           pre_initialize_fields
           update_fields(options)
@@ -235,7 +239,7 @@ module Moon
 
         # @param [Symbol] key
         # @param [Object] value
-        # @return [Void]
+        # @return [void]
         def field_set(key, value)
           field = self.class.fetch_field(key.to_sym)
           send "#{key}=", field.coerce(value)
@@ -243,7 +247,7 @@ module Moon
 
         # @param [Symbol] key
         # @param [Object] value
-        # @return [Void]
+        # @return [void]
         def field_set!(key, value)
           send "_#{key}_set", value
         end
@@ -261,7 +265,7 @@ module Moon
         #
         # @param [Hash<Symbol, Object>] opts
         def update_fields(opts)
-          opts.each { |k, v| field_set k, v }
+          opts.each_pair { |k, v| field_set k, v }
           self
         end
 
@@ -272,7 +276,7 @@ module Moon
         #
         # @param [Hash<Symbol, Object>] opts
         def update_fields!(opts)
-          opts.each { |k, v| field_set! k, v }
+          opts.each_pair { |k, v| field_set! k, v }
           self
         end
 
