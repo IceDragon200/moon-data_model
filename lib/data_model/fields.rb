@@ -42,7 +42,7 @@ module Moon
         prototype_attr :field, default: proc { {} }
         prototype_attr :field_setting, default: proc { {} }
 
-        # Finalizes incomplete fields
+        # Finalizes incomplete fields, see {Field#finalize}
         #
         # @return [void]
         def finalize
@@ -70,27 +70,55 @@ module Moon
           nil
         end
 
+        # Locates a field by name, if teh field is not found a FieldNotFound
+        # is raised.
+        # (see #find_field)
         #
-        def fetch_field(expected_key)
-          find_field(expected_key) ||
+        # @return [Field]
+        def fetch_field(expected_key = nil, &block)
+          find_field(expected_key, &block) ||
             (raise FieldNotFound, "could not find field #{key}.")
         end
 
+        # Field settings are common parameters amongst fields,
+        # it can be used to setup mulitple fields with the same parameters.
+        # Anyway setting/options that can be used on a field line can be
+        # used as a setting.
+        #
         # @overload field_setting(key)
-        #   Retrives value at key
+        #   Retrives field_setting value by key
         #   @param [Symbol] key
         #   @return [Object] value at key
         #
+        #   @example Basic usage
+        #     field_setting :default
+        #
         # @overload field_setting(key, value)
-        #   Sets value at key
+        #   Sets a field_setting value by key
         #   @param [Symbol] key
         #   @param [Object] value
         #   @return [void]
+        #
+        #   @example Basic usage
+        #     field_setting :default, proc { |type| type.model.new }
         #
         # @overload field_setting(options)
         #   Merges the options into the field settings
         #   @param [Hash] options
         #   @return [void]
+        #
+        #   @example Basic usage
+        #     field_setting type: String
+        #
+        # A block can be passed in to temporarily use the field_settings within
+        # the blocks context.
+        # @example
+        #   field_setting type: String do
+        #     # all fields declared here will have the type String
+        #     field :id
+        #     field :name
+        #     field :secret
+        #   end
         def field_setting(obj, *args)
           # allows you to temporarily apply the field_settings to the block.
           if block_given?
@@ -114,6 +142,8 @@ module Moon
 
         # @param [Field] field
         # @param [Symbol] name
+        #
+        # @api private
         private def define_field_writer(field, name)
           setter = "_#{name}_set"
           alias_method setter, "#{name}="
@@ -127,6 +157,8 @@ module Moon
         #
         # @param [Symbol] name
         # @param [Hash] options
+        #
+        # @api private
         private def add_field(name, options)
           field = fields[name.to_sym] = Field.new(options.merge(name: name.to_sym))
 
@@ -140,7 +172,7 @@ module Moon
           name.to_sym
         end
 
-        # Define a new field with option adjustments
+        # Define a new field
         #
         # @param [Symbol] name
         # @param [Hash] options
@@ -171,6 +203,11 @@ module Moon
 
       module ModelCoercion
         # All models are automatically coercable
+
+        # Attempts to convert the provided object to the model
+        #
+        # @param [Object] obj
+        # @return [Object]
         def coerce(obj)
           if obj.is_a?(self)
             obj
@@ -382,11 +419,31 @@ module Moon
           end
           self
         end
+
+        # Gets a field's value with the provided key
+        # This is used to interface with Hash and OpenStruct
+        #
+        # @param [Symbol] key
+        # @return [Object]
+        def [](key)
+          field_get key
+        end
+
+        # Sets a field with the provided key and value
+        # This is used to interface with Hash and OpenStruct
+        #
+        # @param [Symbol] key
+        # @param [Object] value
+        def []=(key, value)
+          field_set key, value
+        end
       end
 
+      include InstanceMethods
+
+      # @param [Module] mod
       def self.included(mod)
         mod.extend         ClassMethods
-        mod.send :include, InstanceMethods
       end
     end
   end
