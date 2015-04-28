@@ -11,7 +11,7 @@ describe Moon::DataModel::Type do
     t = described_class['Array']
     expect(t).to be_incomplete
 
-    t.finalize
+    t = t.finalize
     expect(t).not_to be_incomplete
   end
 

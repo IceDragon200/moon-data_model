@@ -38,9 +38,12 @@ module Moon
         initialize_validators(options.fetch(:validate, []))
       end
 
+      # Finalizes the type, this will replace the current field with the
+      # finalized version. see also {Type#finalize}
+      #
       # @return [void]
       def finalize
-        @type.finalize
+        @type = @type.finalize
       end
 
       # @param [Object] type

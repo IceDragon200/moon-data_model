@@ -14,11 +14,16 @@ module Moon
         @incomplete = options.fetch(:incomplete, false)
       end
 
+      # Attempts to complete the Type, returns self if the type is already
+      # complete, else returns a new Type.
+      #
+      # @return [Type, self]
       def finalize
         if @incomplete
-          @model = Object.const_get(@model)
-          @incomplete = false
+          new_model = Object.const_get(@model)
+          return Type[new_model]
         end
+        self
       end
 
       # Checks if the Type has been completed, if not raises an IncompleteType
