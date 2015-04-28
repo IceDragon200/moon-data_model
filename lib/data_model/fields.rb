@@ -1,15 +1,10 @@
 require 'std/mixins/serializable'
 require 'std/mixins/prototype'
+require 'data_model/err'
 require 'data_model/field'
 
 module Moon
   module DataModel
-    class FieldError < RuntimeError
-    end
-
-    class FieldNotFound < FieldError
-    end
-
     module Fields
       # Patches the provided options hash.
       #
