@@ -17,7 +17,7 @@ module Moon
           @validator = options.fetch(:validator, self.class.default)
         end
 
-        def post_init
+        def post_initialize
           @validator.ensure_type @type
         end
 

@@ -5,18 +5,18 @@ module Moon
     module Validators
       class Base
         def initialize(options)
-          pre_init
+          pre_initialize
           initialize_options(options)
-          post_init
+          post_initialize
         end
 
-        def pre_init
+        def pre_initialize
         end
 
         def initialize_options(options = {})
         end
 
-        def post_init
+        def post_initialize
         end
 
         # @param [Object] value  object to validate
