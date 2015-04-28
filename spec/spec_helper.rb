@@ -47,4 +47,29 @@ module Fixtures
 
   Blog.finalize
   Page.finalize
+
+  class StringModel < Moon::DataModel::Metal
+    field_setting type: String do
+      fail unless field_setting(:type) == String
+      field :first_name
+      field :middle_name, default: nil
+      field :last_name, allow_nil: true
+    end
+
+    field_setting :default, Moon::DataModel::Field.default_proc
+
+    field :extras
+
+    field_settings.delete(:default)
+  end
+
+  class BookPage < Moon::DataModel::Metal
+    field :num, type: Integer
+  end
+
+  class Book < Moon::DataModel::Metal
+    field :name,  type: String
+    array :pages, type: Page
+    dict  :meta,   key: String, value: String
+  end
 end
