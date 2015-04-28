@@ -62,7 +62,7 @@ module Moon
         def find_field(expected_key = nil, &block)
           if block_given?
             each_field do |key, field|
-              return field if block.call(key)
+              return field if block.call(key, field)
             end
           else
             each_field do |key, field|
