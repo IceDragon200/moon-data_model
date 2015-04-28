@@ -1,106 +1,115 @@
-class Pair
-  attr_accessor :key
-  attr_accessor :value
+require 'data_model/err'
 
-  def initialize(key, value)
-    @key = key
-    @value = value
-  end
+module Moon
+  module DataModel
+    class Type
+      attr_reader :model
+      attr_reader :content
 
-  def [](n)
-    n == 0 ? key : value
-  end
+      def initialize(model, content = nil, options = {})
+        @model = model
+        @content = content.presence
+        @array = options.fetch(:array, false)
+        @hash = options.fetch(:hash, false)
+        @incomplete = options.fetch(:incomplete, false)
+      end
 
-  def []=(n, v)
-    if n == 0
-      @key = v
-    else
-      @value = v
+      def finalize
+        if @incomplete
+          @model = Object.const_get(@model)
+          @incomplete = false
+        end
+      end
+
+      # Checks if the Type has been completed, if not raises an IncompleteType
+      # error.
+      def check_complete
+        raise IncompleteType, "incomplete type #{@model}" if @incomplete
+      end
+
+      def array?
+        @array
+      end
+
+      def hash?
+        @hash
+      end
+
+      def incomplete?
+        @incomplete
+      end
+
+      private def coerce_array(obj)
+        if @content
+          # TODO, maybe enforce one content type?
+          klass = @content.first
+          t = Type[klass]
+          obj.map { |o| t.coerce(o) }
+        else
+          Array[obj]
+        end
+      end
+
+      private def coerce_hash(obj)
+        if @content
+          # TODO, maybe enforce one content type?
+          k, v = *@content.first
+          k, v = Type[k], Type[v]
+          obj.each_with_object({}) do |p, r|
+            pk = k.coerce(p[0])
+            pv = v.coerce(p[1])
+            r[pk] = pv
+          end
+        else
+          Hash[obj]
+        end
+      end
+
+      # @param [Object] obj
+      # @return [Object]
+      def coerce(obj)
+        check_complete
+        # Does the type define its own coerce method?
+        if @model.respond_to?(:coerce)
+          @model.coerce(obj)
+        # is the type an Array
+        elsif @array
+          coerce_array(obj)
+        # is the type a Hash
+        elsif @hash
+          coerce_hash(obj)
+        else
+          obj
+        end
+      end
+
+      # @return [Hash<Object, Type>]
+      def self.types
+        @types ||= {}
+      end
+
+      def self.[](type)
+        types[type] ||= begin
+          case type
+          when Array
+            new Array, type, array: true
+          when Hash
+            new Hash, type, hash: true
+          when String
+            new type, nil, incomplete: true
+          when Module
+            if type == Array
+              new type, nil, array: true
+            elsif type == Hash
+              new type, nil, hash: true
+            else
+              new type
+            end
+          else
+            raise InvalidModelType, "cannot create Type from #{type}"
+          end
+        end
+      end
     end
   end
 end
-
-class TypeCheck
-  def check(obj)
-    nil
-  end
-
-  def fail!
-    raise TypeError
-  end
-
-  def check!(obj)
-    unless check obj
-      fail!
-    end
-  end
-
-  def self.from(obj)
-    new obj
-  end
-end
-
-class ClassCheck < TypeCheck
-  def initialize(klass)
-    @klass = klass
-  end
-
-  def check(obj)
-    obj.kind_of? @klass
-  end
-
-  def fail!
-    raise TypeError, "expected object of Type #{@klass}"
-  end
-end
-
-class ArrayCheck < TypeCheck
-  def initialize(ary)
-    @ary = ary
-  end
-
-  def check(obj)
-    @ary.any? { |type| type.check(obj) }
-  end
-
-  def fail!
-    raise TypeError, "expected object of any [#{@ary.join(', ')}]"
-  end
-
-  def self.from(ary)
-    new(ary.map { |o| to_type(o) })
-  end
-end
-
-class HashCheck < TypeCheck
-  def initialize(hash)
-    @hash = hash
-  end
-
-  def check(pair)
-    @hash.any? do |a|
-      a[0].check(pair[0]) && a[1].check(pair[1])
-    end
-  end
-
-  def fail!
-    raise TypeError, "expected object of #{@hash}"
-  end
-
-  def self.from(hash)
-    new(hash.map { |key, value| [to_type(key), to_type(value)] }.to_h)
-  end
-end
-
-def to_type(obj)
-  case obj
-  when Array then ArrayCheck
-  when Hash  then HashCheck
-  else            ClassCheck
-  end.from(obj)
-end
-
-type = to_type [Numeric]
-type.check! 1
-type.check! 2.0
-type.check! [2.0]
