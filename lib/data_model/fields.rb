@@ -1,6 +1,7 @@
-require 'std/mixins/serializable'
-require 'moon-prototype/load'
+require 'moon/packages'
 require 'std/core_ext/array'
+require 'moon-serializable/load'
+require 'moon-prototype/load'
 require 'data_model/err'
 require 'data_model/field'
 
