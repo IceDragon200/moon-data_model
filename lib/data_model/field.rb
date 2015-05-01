@@ -71,7 +71,8 @@ module Moon
 
         # if the @validators already includes a Type validator, just skip this.
         unless options.find { |v| v.is_a?(Validators::Type) }
-          type_validator = Validators.fetch(:type).new(type: @type)
+          type_validator = Validators.fetch(:type).new(type: @type,
+                                                       allow_nil: @allow_nil)
           @validators = [type_validator].concat(@validators)
         end
       end

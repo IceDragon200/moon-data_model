@@ -24,6 +24,7 @@ module Moon
         def initialize_options(options)
           super
           @type = options.fetch(:type)
+          @allow_nil = options.fetch(:allow_nil, false)
           @validator = options.fetch(:validator, self.class.default)
         end
 
@@ -35,7 +36,8 @@ module Moon
 
         # (see Base#valid?)
         def valid?(value)
-          @validator.check_type(@type, value, quiet: true)
+          @validator.check_type(@type, value,
+                                quiet: true, allow_nil: @allow_nil)
         end
 
         register :type
