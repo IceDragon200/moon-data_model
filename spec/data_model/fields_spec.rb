@@ -1,10 +1,5 @@
 require 'spec_helper'
-require 'std/core_ext/array'
-require 'std/inflector'
-require 'std/inflector/core_ext/string'
-require 'std/mixins/prototype'
-require 'std/mixins/serializable'
-require 'data_model/load'
+require 'data_model/fields'
 
 describe Moon::DataModel::Fields do
   subject(:person) { Fixtures::Person.new(name: 'Henry', age: 26) }

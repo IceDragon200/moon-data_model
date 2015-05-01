@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'data_model/load'
+require 'data_model/metal'
 
 describe Moon::DataModel::Metal do
   context '#initialize' do
