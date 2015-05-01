@@ -13,6 +13,8 @@ module Moon
       attr_reader :default
       # @return [Boolean] allow_nil  are nils allowed for the value?
       attr_reader :allow_nil
+      # @return [Boolean] coerce_values  should the field coerce its values?
+      attr_reader :coerce_values
       # @return [Boolean] is_key  Is this a key field (such as an id)?
       attr_reader :is_key
       # @return [Array<Validator::Base<>>]
@@ -25,17 +27,20 @@ module Moon
       #   An object that can be transformed into a DataModel::Type
       # @option options [Boolean] :allow_nil
       #   Does this field allow nil values?
+      # @option options [Boolean] :coerce_values
+      #   Coerce values, may cause undesirable behaviour with certain types.
       # @option options [Boolean] :is_key
       #   Mark this field as the `key` field
       # @option options [Hash<Symbol, Object>] :validate
       #   Validation parameters, keys are the name of the validator
       #   and their values are the parameters for that validator.
       def initialize(options)
-        @name       = options.fetch(:name)
+        @name          = options.fetch(:name)
         initialize_type(options.fetch(:type))
-        @default    = options.fetch(:default, nil)
-        @allow_nil  = options.fetch(:allow_nil, false)
-        @is_key     = options.fetch(:is_key, false)
+        @default       = options.fetch(:default, nil)
+        @allow_nil     = options.fetch(:allow_nil, false)
+        @coerce_values = options.fetch(:coerce_values, false)
+        @is_key        = options.fetch(:is_key, false)
         initialize_validators(options.fetch(:validate, {}))
       end
 
@@ -71,8 +76,9 @@ module Moon
 
         # if the @validators already includes a Type validator, just skip this.
         unless options.find { |v| v.is_a?(Validators::Type) }
-          type_validator = Validators.fetch(:type).new(type: @type,
-                                                       allow_nil: @allow_nil)
+          k = Validators.fetch(:type)
+          type_validator = k.new(type: @type, allow_nil: @allow_nil,
+                                 ctx: { key: @name })
           @validators = [type_validator].concat(@validators)
         end
       end
@@ -84,6 +90,7 @@ module Moon
       #
       # @api public
       def coerce(value)
+        return value unless @coerce_values
         @type.coerce(value)
       end
 
@@ -102,7 +109,7 @@ module Moon
       # @param [Object] value
       # @return [Boolean]
       def valid?(value)
-        @validators.each do |validator|
+        @validators.all? do |validator|
           validator.valid?(value)
         end
       end

@@ -1,5 +1,3 @@
-require 'moon/packages'
-require 'std/core_ext/array'
 require 'moon-serializable/load'
 require 'moon-prototype/load'
 require 'data_model/err'
@@ -44,8 +42,8 @@ module Moon
         extend Moon::Prototype
         include Serializable::Properties::ClassMethods
 
-        prototype_attr :field,         default: proc { Hash.new }
-        prototype_attr :field_setting, default: proc { Hash.new }
+        prototype_attr :field,         type: Hash
+        prototype_attr :field_setting, type: Hash
 
         # Finalizes incomplete fields, see {Field#finalize}
         #
@@ -137,7 +135,7 @@ module Moon
               field_settings.merge!(obj)
             else
               if args.size > 0
-                field_settings[obj] = args.singularize
+                field_settings[obj] = args.first
               else
                 field_settings[obj]
               end
@@ -201,7 +199,7 @@ module Moon
         # @return [Symbol]
         def dict(sym, options)
           default = (options[:default] || proc{ Hash.new })
-          type = Hash[options.fetch(:key)=>options.fetch(:value)]
+          type = Hash[options.fetch(:key) => options.fetch(:value)]
           field sym, options.merge(type: type, default: default)
         end
       end
@@ -296,6 +294,9 @@ module Moon
           field = self.class.fetch_field(key.to_sym)
           send "#{key}=", field.coerce(value)
         end
+
+        # (see #field_set)
+        alias :store :field_set
 
         # Hard sets a field value by key, the value will bypass validations
         # and coercion.
@@ -420,9 +421,7 @@ module Moon
         end
 
         # (see #each_pair)
-        def each(&block)
-          each_pair(&block)
-        end
+        alias :each :each_pair
 
         # Should fields be validated?
         # see also {Field#validate}
@@ -436,28 +435,32 @@ module Moon
         #
         # @return [Hash<Symbol, Object>]
         def fields_hash
-          each_field_name.each_with_object({}) { |p, r| r[p[0]] = p[1] }
+          each_pair.to_h
         end
 
         # (see #fields_hash)
-        def fields
-          fields_hash
-        end
+        alias :fields :fields_hash
 
         # (see #update_fields)
         def fields=(opts)
           update_fields(opts)
         end
 
-        # Checks if all fields are valid, returns a list of invalid fields
+        # Checks if fields are valid, returns false on the first failure.
         #
-        # @return [Array<Symbol>, nil] key
+        # @return [Boolean]
         def valid?
-          invalid = []
-          each_field_with_value do |key, field, value|
-            invalid << key unless field.valid?(value)
+          each_field_with_value do |_, field, value|
+            return false unless field.valid?(value)
           end
-          invalid.presence
+          true
+        end
+
+        # Checks if the model is invalid
+        #
+        # @return [Boolean]
+        def invalid?
+          !valid?
         end
 
         # Runs the validation for each field on the model.

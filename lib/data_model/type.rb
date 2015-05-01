@@ -67,17 +67,20 @@ module Moon
       end
 
       private def coerce_array(obj)
+        return nil if obj.nil?
         if @content
           # TODO, maybe enforce one content type?
           klass = @content.first
           t = Type[klass]
           obj.map { |o| t.coerce(o) }
         else
+          return obj if obj.is_a?(Array)
           Array[obj]
         end
       end
 
       private def coerce_hash(obj)
+        return nil if obj.nil?
         if @content
           # TODO, maybe enforce one content type?
           k, v = *@content.first
@@ -88,6 +91,7 @@ module Moon
             r[pk] = pv
           end
         else
+          return obj if obj.is_a?(Hash)
           Hash[obj]
         end
       end
