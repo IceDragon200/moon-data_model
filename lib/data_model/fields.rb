@@ -1,5 +1,5 @@
 require 'std/mixins/serializable'
-require 'std/mixins/prototype'
+require 'moon-prototype/load'
 require 'std/core_ext/array'
 require 'data_model/err'
 require 'data_model/field'
@@ -40,10 +40,11 @@ module Moon
 
       # Methods for setting up, and finding fields on a Model class.
       module Modelling
+        extend Moon::Prototype
         include Serializable::Properties::ClassMethods
 
-        prototype_attr :field, default: proc { {} }
-        prototype_attr :field_setting, default: proc { {} }
+        prototype_attr :field,         default: proc { Hash.new }
+        prototype_attr :field_setting, default: proc { Hash.new }
 
         # Finalizes incomplete fields, see {Field#finalize}
         #
