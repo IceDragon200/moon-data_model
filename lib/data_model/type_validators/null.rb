@@ -13,7 +13,7 @@ module Moon
         # @param [Hash] options
         # @return [Boolean]
         protected def do_check(type, value, options = {})
-          true
+          return true, nil
         end
 
         extend self

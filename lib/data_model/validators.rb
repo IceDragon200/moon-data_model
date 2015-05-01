@@ -8,6 +8,7 @@ module Moon
       @registry = {}
 
       # Registers a Validator
+      #
       # @param [Symbol] key
       # @param [Validator::Base] validator
       def self.register(key, validator)

@@ -45,11 +45,10 @@ module Moon
         protected def do_check(type, value, options = {})
           if value.nil?
             if options[:allow_nil]
-              return true
-            elsif options[:quiet]
-              return false
+              return true, nil
             else
-              raise ArgumentError, "cannot be nil (expects #{type})"
+              return false,
+                format_err("cannot be nil (expects #{type})", options[:ctx])
             end
           end
 
@@ -63,7 +62,8 @@ module Moon
           elsif type.model.is_a?(Module)
             check_normal_type(type, value, options)
           else
-            raise InvalidType, "cannot handle #{type.model}"
+            raise InvalidType,
+              format_err("cannot handle #{type.model}", options[:ctx])
           end
         end
 
