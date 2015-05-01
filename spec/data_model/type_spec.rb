@@ -37,12 +37,12 @@ describe Moon::DataModel::Type do
 
     expect(hsh_str_str).to be_kind_of(Moon::DataModel::Type)
     expect(hsh_str_str.model).to equal(Hash)
-    expect(hsh_str_str.content).to eq({String=>String})
+    expect(hsh_str_str.content).to eq(Hash[String => String])
     expect(hsh_str_str).to be_hash
 
     expect(ary_str).to be_kind_of(Moon::DataModel::Type)
     expect(ary_str.model).to equal(Array)
-    expect(ary_str.content).to eq([String])
+    expect(ary_str.content).to eq(Array[String])
     expect(ary_str).to be_array
   end
 
@@ -78,10 +78,11 @@ describe Moon::DataModel::Type do
     expect(actual).to eq(a: 1, b: 2)
 
     m = described_class[Fixtures::ModelTest]
-    actual = m.coerce(a: 'Hello World', b: 'How are you', c: 3)
+    actual = m.coerce(a: 'Hello World', b: 12, c: [3], d: {a:1})
     expect(actual).to be_kind_of(Fixtures::ModelTest)
     expect(actual.a).to eq('Hello World')
-    expect(actual.b).to eq('How are you')
-    expect(actual.c).to eq(3)
+    expect(actual.b).to eq(12)
+    expect(actual.c).to eq([3])
+    expect(actual.d).to eq({a: 1})
   end
 end

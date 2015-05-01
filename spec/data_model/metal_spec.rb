@@ -4,19 +4,32 @@ require 'data_model/metal'
 describe Moon::DataModel::Metal do
   context '#initialize' do
     it 'should initialize and set default fields' do
-      obj = Fixtures::MetalTest.new
+      obj = Fixtures::IdModel.new
       expect(obj.id).to eq('GIMME_AN_ID')
     end
 
     it 'should initialize given a hash' do
-      obj = Fixtures::MetalTest.new(id: '123abc')
+      obj = Fixtures::IdModel.new(id: '123abc')
       expect(obj.id).to eq('123abc')
     end
 
     it 'should initialize sub models from hashes' do
-      obj = Fixtures::SubModelTest.new(name: 'Awesome', metal: { id: 'ABC123' })
+      obj = Fixtures::SubModelTest.new(
+        name: 'Awesome',
+        sub_model: {
+          id: 'ABC123',
+          a: 'Hello World',
+          b: 1,
+          c: [],
+          d: {}
+        }
+      )
       expect(obj.name).to eq('Awesome')
-      expect(obj.metal.id).to eq('ABC123')
+      expect(obj.sub_model.id).to eq('ABC123')
+      expect(obj.sub_model.a).to eq('Hello World')
+      expect(obj.sub_model.b).to eq(1)
+      expect(obj.sub_model.c).to eq([])
+      expect(obj.sub_model.d).to eq({})
     end
   end
 
@@ -27,8 +40,9 @@ describe Moon::DataModel::Metal do
         pages: [Fixtures::BookPage.new(num: 1)],
         meta: { "is_awesome_book" => "9/11, IGN"}
       )
+
       actual = obj.to_h
-      expect(actual).to be_instance_of(Hash)
+
       expect(actual).to eq({
         name: 'Stupid Multi Core tricks',
         pages: [{ num: 1 }],
