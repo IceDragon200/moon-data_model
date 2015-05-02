@@ -4,4 +4,5 @@ author: IceDragon200 (Corey Powell) (mistdragon100@gmail.com)
 description: Defines generic DataModel structures.
 require: _basalt.rb
 deps:
-- std
+- moon-prototype
+- moon-serializable
