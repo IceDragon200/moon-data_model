@@ -13,7 +13,7 @@ module Moon
         attr_accessor :ctx
 
         # @param [Hash<Symbol, Object>] options
-        def initialize(options)
+        def initialize(options = {})
           pre_initialize
           initialize_options(options)
           post_initialize
