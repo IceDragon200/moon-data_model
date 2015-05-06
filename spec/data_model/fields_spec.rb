@@ -60,6 +60,19 @@ describe Moon::DataModel::Fields do
         expect { Fixtures::BasicModel.fetch_field(:egg) }.to raise_error(Moon::DataModel::FieldNotFound)
       end
     end
+
+    context '.coerce' do
+      it 'attempts to convert a given object into the model' do
+        a = Fixtures::IdModel.coerce(id: 'ABC123')
+        expect(a).to be_instance_of(Fixtures::IdModel)
+
+        b = Fixtures::IdModel.coerce(a)
+        expect(a).to equal(b)
+
+        c = Fixtures::IdModel.coerce 'ABC123'
+        expect(c).to eq('ABC123')
+      end
+    end
   end
 
   context '#initialize_fields' do
