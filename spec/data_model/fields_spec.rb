@@ -186,4 +186,18 @@ describe Moon::DataModel::Fields do
       expect(obj.fields).to eq(data)
     end
   end
+
+  context '#[]/=' do
+    it 'gets a field by key' do
+      obj = Fixtures::ModelWithDefaults.new
+      expect(obj[:a]).to eq('')
+    end
+
+    it 'sets a field by key' do
+      obj = Fixtures::ModelWithDefaults.new
+      expect(obj[:a]).to eq('')
+      obj[:a] = 'Model'
+      expect(obj[:a]).to eq('Model')
+    end
+  end
 end
