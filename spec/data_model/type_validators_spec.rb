@@ -8,7 +8,15 @@ context do
   shared_examples 'TypeValidator' do
 
     context '.check_type' do
-      it 'should return true' do
+      it 'fails if the given type isn\'t a Type' do
+        expect { described_class.check_type(Integer, 1) }.to raise_error TypeError
+      end
+
+      it 'fails if the given type.model is invalid' do
+        expect { described_class.check_type(type[nil], 1) }.to raise_error(Moon::DataModel::InvalidModelType)
+      end
+
+      it 'returns true if the type is correct' do
         expect(described_class.check_type(type[Integer], 1)).to eq([true, nil])
       end
 
@@ -30,8 +38,11 @@ context do
         described_class.check_type(type[Hash[String => Integer]], { 'Hello World' => 12, 'My String' => 24 })
       end
 
+      it 'errors if :allow_nil is false and the value is nil' do
+        expect { described_class.check_type(type[String], nil, allow_nil: false) }.to raise_error(validation_err)
+      end
+
       it 'should error on wrong type' do
-        rs =
         expect { described_class.check_type(type[String], 1) }.to raise_error(validation_err)
         expect { described_class.check_type(type[String], []) }.to raise_error(validation_err)
         expect { described_class.check_type(type[String], {}) }.to raise_error(validation_err)
@@ -80,6 +91,7 @@ context do
     it 'errors on invalid composite Hash content' do
       hash_str_int = type[Hash[String => Integer]]
       expect { described_class.check_type(hash_str_int, { 'This' => 12, 'Hello' => 'World' }) }.to raise_error(validation_err)
+      expect { described_class.check_type(hash_str_int, { 1 => 12, 'Hello' => 13 }) }.to raise_error(validation_err)
     end
   end
 end
