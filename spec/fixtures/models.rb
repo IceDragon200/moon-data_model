@@ -15,18 +15,19 @@ module Fixtures
     field :id, type: String, default: proc { 'GIMME_AN_ID' }
   end
 
-  class ModelWithDefaults < IdModel
-    field :a, type: String,  default: ''
-    field :b, type: Integer, default: 0
-    array :c, type: Object
-    dict :d,  key: Object, value: Object
-  end
-
   class ModelTest < IdModel
     field :a, type: String
     field :b, type: Integer
     field :c, type: Array
     field :d, type: Hash
+  end
+
+  # Same as the ModelTest, but with defaul values for all fields
+  class ModelWithDefaults < IdModel
+    field :a, type: String,  default: ''
+    field :b, type: Integer, default: 0
+    array :c, type: Object
+    dict  :d, key:  Object, value: Object
   end
 
   class SubModelTest < IdModel
