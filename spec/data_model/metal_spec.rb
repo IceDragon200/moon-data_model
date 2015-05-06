@@ -34,7 +34,7 @@ describe Moon::DataModel::Metal do
   end
 
   context '#to_h' do
-    it 'should convert the model to a Hash' do
+    it 'should convert the model to a Hash (basic)' do
       obj = Fixtures::Book.new(
         name: 'Stupid Multi Core tricks',
         pages: [Fixtures::BookPage.new(num: 1)],
@@ -48,6 +48,20 @@ describe Moon::DataModel::Metal do
         pages: [{ num: 1 }],
         meta: { "is_awesome_book"=>"9/11, IGN" }
       })
+    end
+
+    it 'should convert a complex nestedt model to a Hash' do
+      data = {
+        a: 'A',
+        ary_model: [{ id: 'ABC123' }, { id: 'DEF456' }],
+        ary_hash: [{ a: 1, b: 2 }, { c: 3, d: 4 }],
+        ary_ary: [[1, 2], [3, 4]],
+        hash_model: { "ABC123" => { id: '1' }, "DEF456" => { id: '2' } },
+        hash_ary: { "ABC123" => [1, 2, 3], "DEF456" => [4, 5, 6] },
+        hash_hash: { "ABC123" => { a: 1, b: 2 }, "DEF456" => { c: 3, d: 4 } }
+      }
+      model = Fixtures::DeepNestedModel.new(data)
+      expect(model.to_h).to eq(data)
     end
   end
 end

@@ -1,4 +1,5 @@
 require 'data_model/model'
+require 'data_model/fields_to_hash'
 
 module Moon
   # Moon::DataModel serves as the base for most structured data types in Moon
@@ -48,23 +49,7 @@ module Moon
       #
       # @return [Hash<Symbol, Object>]
       def to_h
-        hsh = {}
-        each_pair do |k, obj|
-          if obj.is_a?(Array)
-            obj = obj.map do |o|
-              o.respond_to?(:to_h) ? o.to_h : o
-            end
-          elsif obj.is_a?(Hash)
-            obj = obj.each_with_object({}) do |a, hash|
-              hk, hv = *a
-              hash[hk] = hv.respond_to?(:to_h) ? hv.to_h : hv
-            end
-          else
-            obj = obj.to_h if obj.respond_to?(:to_h)
-          end
-          hsh[k] = obj
-        end
-        hsh
+        FieldsToHash.call(self)
       end
     end
   end

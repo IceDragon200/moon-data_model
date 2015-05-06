@@ -59,6 +59,17 @@ module Fixtures
     dict  :meta,  key: String, value: String
   end
 
+  # This model is for testing #to_h, in its complete form
+  class DeepNestedModel < Moon::DataModel::Metal
+    field :a,              type: String
+    array :ary_model,      type: IdModel
+    array :ary_hash,       type: Hash
+    array :ary_ary,        type: Array
+    dict  :hash_model,     key: String, value: IdModel
+    dict  :hash_ary,       key: String, value: Array
+    dict  :hash_hash,      key: String, value: Hash
+  end
+
   # incomplete Types
   class Blog < Moon::DataModel::Metal
     array :pages, type: 'Fixtures::Page'
