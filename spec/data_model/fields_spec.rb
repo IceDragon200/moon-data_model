@@ -4,59 +4,69 @@ require 'data_model/fields'
 describe Moon::DataModel::Fields do
   subject(:basic_model) { Fixtures::BasicModel.new(name: 'Henry', age: 26) }
 
-  context '.field' do
-    it 'should allow nil values if allow_nil is true' do
-      person = Fixtures::Person.new(first_name: 'Henry', last_name: nil)
-    end
-  end
-
-  context '.fields' do
-    it 'returns a list of fields for the model (only for the current class)' do
-      actual = Fixtures::ModelTest.fields
-      expect(actual.keys).to eq([:a, :b, :c, :d])
-    end
-  end
-
-  context '.all_fields' do
-    it 'returns a list of all fields for the model' do
-      actual = Fixtures::ModelTest.all_fields
-      expect(actual.keys).to eq([:id, :a, :b, :c, :d])
-    end
-  end
-
-  context '.each_field' do
-    it 'should iterate each field on the class' do
-      result = []
-      Fixtures::BasicModel.each_field do |key, field|
-        result << [key, field]
+  context 'ClassMethods' do
+    context '.field' do
+      it 'should allow nil values if allow_nil is true' do
+        person = Fixtures::Person.new(first_name: 'Henry', last_name: nil)
       end
-      expect(result.map(&:first)).to eq([:name, :age])
+    end
+
+    context '.fields' do
+      it 'returns a list of fields for the model (only for the current class)' do
+        actual = Fixtures::ModelTest.fields
+        expect(actual.keys).to eq([:a, :b, :c, :d])
+      end
+    end
+
+    context '.all_fields' do
+      it 'returns a list of all fields for the model' do
+        actual = Fixtures::ModelTest.all_fields
+        expect(actual.keys).to eq([:id, :a, :b, :c, :d])
+      end
+    end
+
+    context '.each_field' do
+      it 'should iterate each field on the class' do
+        result = []
+        Fixtures::BasicModel.each_field do |key, field|
+          result << [key, field]
+        end
+        expect(result.map(&:first)).to eq([:name, :age])
+      end
+    end
+
+    context '.find_field' do
+      it 'should locate a field by key' do
+        actual = Fixtures::BasicModel.find_field(:name)
+        expect(actual).to be_kind_of(Moon::DataModel::Field)
+        expect(actual.name).to eq(:name)
+      end
+
+      it 'should locate a field by block' do
+        actual = Fixtures::BasicModel.find_field { |_, field| field.name == :age }
+        expect(actual).to be_kind_of(Moon::DataModel::Field)
+        expect(actual.name).to eq(:age)
+      end
+    end
+
+    context '.fetch_field' do
+      it 'should fetch an existing field' do
+        field = Fixtures::ModelTest.fetch_field(:a)
+        expect(field.name).to eq(:a)
+        expect(field.type).to equal(Moon::DataModel::Type[String])
+      end
+
+      it 'should fail with FieldNotFound if teh field doesn\'t exist' do
+        expect { Fixtures::BasicModel.fetch_field(:egg) }.to raise_error(Moon::DataModel::FieldNotFound)
+      end
     end
   end
 
-  context '.find_field' do
-    it 'should locate a field by key' do
-      actual = Fixtures::BasicModel.find_field(:name)
-      expect(actual).to be_kind_of(Moon::DataModel::Field)
-      expect(actual.name).to eq(:name)
-    end
-
-    it 'should locate a field by block' do
-      actual = Fixtures::BasicModel.find_field { |_, field| field.name == :age }
-      expect(actual).to be_kind_of(Moon::DataModel::Field)
-      expect(actual.name).to eq(:age)
-    end
-  end
-
-  context '.fetch_field' do
-    it 'should fetch an existing field' do
-      field = Fixtures::ModelTest.fetch_field(:a)
-      expect(field.name).to eq(:a)
-      expect(field.type).to equal(Moon::DataModel::Type[String])
-    end
-
-    it 'should fail with FieldNotFound if teh field doesn\'t exist' do
-      expect { Fixtures::BasicModel.fetch_field(:egg) }.to raise_error(Moon::DataModel::FieldNotFound)
+  context '#initialize_fields' do
+    it 'initializes fields given a Hash' do
+      model = Fixtures::BasicModel.new(name: 'Kiddo', age: 18)
+      expect(model.name).to eq('Kiddo')
+      expect(model.age).to eq(18)
     end
   end
 
