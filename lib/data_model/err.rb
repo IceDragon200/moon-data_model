@@ -28,5 +28,9 @@ module Moon
     # Generic validation error raised by {Validators}
     class ValidationFailed < StandardError
     end
+
+    # Error raised when a Validator could not be found for the given key.
+    class NoSuchValidator < KeyError
+    end
   end
 end

@@ -9,4 +9,5 @@ SimpleCov.start
 
 require 'data_model/load'
 
+require 'fixtures/validators'
 require 'fixtures/models'

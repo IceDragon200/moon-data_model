@@ -70,6 +70,11 @@ module Fixtures
     dict  :hash_hash,      key: String, value: Hash
   end
 
+  # This model is used for testing the validators API
+  class L3Model < Moon::DataModel::Metal
+    field :name, type: String, validate: { longer_than3: {} }
+  end
+
   # incomplete Types
   class Blog < Moon::DataModel::Metal
     array :pages, type: 'Fixtures::Page'
