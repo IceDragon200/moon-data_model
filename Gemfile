@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'moon-serializable', github: 'IceDragon200/moon-serializable'
-gem 'moon-prototype',    github: 'IceDragon200/moon-prototype'
+gem 'moon-serializable', github: 'polyfox/moon-serializable'
+gem 'moon-prototype',    github: 'polyfox/moon-prototype'
 
 gemspec
