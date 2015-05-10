@@ -48,7 +48,7 @@ module Moon
               return true, nil
             else
               return false,
-                format_err("cannot be nil (expects #{type})", options[:ctx])
+                format_err("cannot be nil (expects #{type.model})", options[:ctx])
             end
           end
 
