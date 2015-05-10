@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name        = 'moon-data_model'
   s.summary     = 'Moon DataModel package.'
   s.description = 'Moon DataModel package, extracted the moon-packages.'
-  s.homepage    = 'https://github.com/IceDragon200/moon-data_model'
+  s.homepage    = 'https://github.com/polyfox/moon-data_model'
   s.email       = 'mistdragon100@gmail.com'
   s.version     = Moon::DataModel::Version::STRING
   s.platform    = Gem::Platform::RUBY
