@@ -1,5 +1,6 @@
 require 'moon-serializable/load'
 require 'moon-prototype/load'
+require 'moon-safe_copy/load'
 require 'data_model/err'
 require 'data_model/field'
 
@@ -32,6 +33,10 @@ module Moon
         # if no type was given, assume it allows anything, therefore Object
         unless options.key?(:type)
           options[:type] = ::Object
+        end
+
+        unless (obj = options[:default]).is_a?(Proc)
+          options[:default] = ->(_, _) { obj.safe_dup }
         end
 
         options

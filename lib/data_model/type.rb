@@ -4,9 +4,12 @@ module Moon
   module DataModel
     # Class for representing Object types
     class Type
+      # Class representing the Type
       # @!attribute [r] model
       #   @return [Module] the main class of the type
       attr_reader :model
+
+      # Object representing the model's content, if any.
       # @!attribute [r] content
       #   @return [Hash, Array, nil] depending on the model
       attr_reader :content
@@ -66,6 +69,8 @@ module Moon
         @incomplete
       end
 
+      # @param [Object] obj
+      # @return [Array, nil]
       private def coerce_array(obj)
         return nil if obj.nil?
         if @content
@@ -79,6 +84,8 @@ module Moon
         end
       end
 
+      # @param [Object] obj
+      # @return [Hash, nil]
       private def coerce_hash(obj)
         return nil if obj.nil?
         if @content
@@ -96,6 +103,8 @@ module Moon
         end
       end
 
+      # Attempts to convert the given object to the Type's model and content
+      #
       # @param [Object] obj
       # @return [Object]
       def coerce(obj)

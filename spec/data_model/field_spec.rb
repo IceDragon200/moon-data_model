@@ -6,7 +6,8 @@ describe Moon::DataModel::Field do
     f = described_class.new(name: :test, type: Object)
     expect(f.name).to eq(:test)
     expect(f.allow_nil).to eq(false)
-    expect(f.default).to eq(nil)
+    expect(f.default).to be_kind_of Proc
+    expect(f.make_default).to be_nil
     expect(f.is_key).to eq(false)
     expect(f.type).to equal(Moon::DataModel::Type[Object])
   end

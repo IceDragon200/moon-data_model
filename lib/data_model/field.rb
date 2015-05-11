@@ -7,16 +7,22 @@ module Moon
     class Field
       # @return [Symbol] name of the field
       attr_reader :name
+
       # @return [Array, Hash, Class] type
       attr_reader :type
+
       # @return [Proc, Object] default
       attr_reader :default
+
       # @return [Boolean] allow_nil  are nils allowed for the value?
       attr_reader :allow_nil
+
       # @return [Boolean] coerce_values  should the field coerce its values?
       attr_reader :coerce_values
+
       # @return [Boolean] is_key  Is this a key field (such as an id)?
       attr_reader :is_key
+
       # @return [Array<Validator::Base<>>]
       attr_reader :validators
 
@@ -37,7 +43,7 @@ module Moon
       def initialize(options)
         @name          = options.fetch(:name)
         initialize_type(options.fetch(:type))
-        @default       = options.fetch(:default, nil)
+        @default       = options.fetch(:default, ->(_, _) { nil })
         @allow_nil     = options.fetch(:allow_nil, false)
         @coerce_values = options.fetch(:coerce_values, false)
         @is_key        = options.fetch(:is_key, false)
@@ -101,7 +107,7 @@ module Moon
       #
       # @api public
       def make_default(model = nil)
-        @default.is_a?(Proc) ? @default.call(@type, model) : @default
+        @default.call(@type, model)
       end
 
       # Checks that the given value is valid for the field.
