@@ -15,7 +15,7 @@ module Moon
           attr_accessor :default
         end
 
-        self.default ||= Moon::DataModel::TypeValidators::Verbose
+        self.default ||= Moon::DataModel::TypeValidators::Soft
 
         # @param [Hash] options
         # @option options [Type] :type
@@ -25,18 +25,22 @@ module Moon
           super
           @type = options.fetch(:type)
           @allow_nil = options.fetch(:allow_nil, false)
-          @validator = options.fetch(:validator, self.class.default)
+          @validator = options[:validator]
+        end
+
+        def validator
+          @validator || self.class.default
         end
 
         # @api private
         def post_initialize
           # TODO, find some way of asserting classes
-          @validator.send :ensure_obj_is_a_type, @type
+          validator.send :ensure_obj_is_a_type, @type
         end
 
         # (see Base#test_valid)
         def test_valid(value)
-          @validator.check_type(@type, value,
+          validator.check_type(@type, value,
             quiet: true, allow_nil: @allow_nil, ctx: @ctx)
         end
 
