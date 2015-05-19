@@ -4,6 +4,8 @@ module Moon
   module DataModel
     # Class for representing Object types
     class Type
+      @@types = {}
+
       # Class representing the Type
       # @!attribute [r] model
       #   @return [Module] the main class of the type
@@ -125,7 +127,26 @@ module Moon
 
       # @return [Hash<Object, Type>]
       def self.types
-        @types ||= {}
+        @@types
+      end
+
+      def self.make_type_for(type)
+        case type
+        when Array
+          new Array, type, array: true
+        when Hash
+          new Hash, type, hash: true
+        when Module
+          if type == Array
+            new type, nil, array: true
+          elsif type == Hash
+            new type, nil, hash: true
+          else
+            new type
+          end
+        else
+          raise InvalidModelType, "cannot create Type from #{type}"
+        end
       end
 
       # Returns a complete Type from the given params
@@ -133,24 +154,7 @@ module Moon
       # @param [Object] type  an object that can be converted to a Type
       # @return [Type]
       def self.get_complete_type(type)
-        types[type] ||= begin
-          case type
-          when Array
-            new Array, type, array: true
-          when Hash
-            new Hash, type, hash: true
-          when Module
-            if type == Array
-              new type, nil, array: true
-            elsif type == Hash
-              new type, nil, hash: true
-            else
-              new type
-            end
-          else
-            raise InvalidModelType, "cannot create Type from #{type}"
-          end
-        end
+        types[type] ||= make_type_for(type)
       end
 
       # Returns a incomplete or complete Type based on the given parameters
