@@ -1,4 +1,5 @@
-require 'data_model/model'
+require 'moon-serializable/load'
+require 'data_model/fields'
 require 'data_model/fields_to_hash'
 
 module Moon
@@ -6,7 +7,8 @@ module Moon
   module DataModel
     # Metal is a generic implementation of Moon::DataModel::Model
     class Metal
-      include Model
+      include Fields
+      include Serializable
 
       # @return [Integer] Global DataModel id, incremented each time a Metal
       #                   based model is created.
