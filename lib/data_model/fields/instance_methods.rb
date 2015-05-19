@@ -34,9 +34,9 @@ module Moon
         #   A list of fields not to initialize
         # @return [void]
         private def initialize_fields_default(dont_init = [])
+          dont_init = dont_init.map(&:to_sym)
           each_field_name do |k|
-            next if dont_init.any? { |s| s.to_s == k.to_s }
-            reset_field(k)
+            reset_field(k) unless dont_init.include?(k)
           end
         end
 
@@ -55,7 +55,7 @@ module Moon
         # @return [void]
         def initialize_fields(options = {})
           pre_initialize_fields
-          update_fields(options)
+          update_fields(options) unless options.empty?
           initialize_fields_default(options.keys)
           post_initialize_fields
         end
