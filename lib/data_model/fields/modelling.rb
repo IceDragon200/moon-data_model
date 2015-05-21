@@ -115,60 +115,83 @@ module Moon
 
         # @param [Field] field
         # @param [Symbol] name
+        # @return [Symbol]
         #
         # @api private
         private def define_field_writer(field, name)
-          setter = "_#{name}_set"
-          alias_method setter, "#{name}="
-          define_method "#{name}=" do |obj|
+          setter = "_#{name}_set".to_sym
+          alias_method setter, "#{name}=".to_sym
+          define_method "#{name}=".to_sym do |obj|
             field.validate(obj) if validate_fields?
             send setter, obj
           end
         end
 
-        # Define a new field, without option adjustments
+        # Registers and creates accessors for a given field
         #
-        # @param [Symbol] name
-        # @param [Hash] options
+        # @param [Field] field
+        # @return [Symbol] field name
+        # @return [Symbol]
         #
-        # @api private
-        private def add_field(name, options)
-          field = fields[name.to_sym] = Field.new(options.merge(name: name.to_sym))
+        # @api public
+        def add_field(field)
+          fields[field.name] = field
 
           # first setup the Serializable property, this also creates the
           # initial attr for us
-          property_accessor name
+          property_accessor field.name
           # next we'll need to overwrite the writer created by property_accessor,
           # with our field validation one.
-          define_field_writer field, name
+          define_field_writer field, field.name
 
-          name.to_sym
+          field.name
         end
 
-        # Define a new field
+        # Defines a new, without option adjustments
+        #
+        # @param [Symbol] name
+        # @param [Hash] options
+        # @return [Symbol]
+        #
+        # @api public
+        def define_field(name, options)
+          add_field Field.new(options.merge(name: name.to_sym))
+        end
+
+        # Defines a new field with option adjustments
         #
         # @param [Symbol] name
         # @param [Hash] options
         # @return [Symbol]
         def field(name, options = {})
-          add_field name, Fields.adjust_field_options(self, options)
+          define_field name, Fields.adjust_field_options(self, options)
         end
 
         # Defines a new Array field, is a shorthand for field type: [Type]
         #
+        # @param [Symbol] sym
+        # @param [Hash<Symbol, Object>] options
+        # @option options [Integer] :size  default: 0
+        # @option options [Proc, Object] :default
+        # @option options [Module] :type  content type of the Array
         # @return [Symbol]
         def array(sym, options)
-          size = options.delete(:size) || 0
-          default = (options[:default] || proc{ Array.new(size) })
+          size = options.fetch(:size, 0)
+          default = options.fetch(:default) { ->(_, _) { Array.new(size) } }
           type = Array[options.fetch(:type)]
           field sym, options.merge(type: type, default: default)
         end
 
         # Defines a new Hash field, is a shorthand for field type: {Type=>Type}
         #
+        # @param [Symbol] sym
+        # @param [Hash<Symbol, Object>] options
+        # @option options [Proc, Object] :default
+        # @option options [Module] :key  key type
+        # @option options [Module] :value  value type
         # @return [Symbol]
         def dict(sym, options)
-          default = (options[:default] || proc{ Hash.new })
+          default = options.fetch(:default) { ->(_, _) { Hash.new } }
           type = Hash[options.fetch(:key) => options.fetch(:value)]
           field sym, options.merge(type: type, default: default)
         end
