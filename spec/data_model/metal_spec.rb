@@ -63,5 +63,17 @@ describe Moon::DataModel::Metal do
       model = Fixtures::DeepNestedModel.new(data)
       expect(model.to_h).to eq(data)
     end
+
+    # this is to test for a bug, where fields with nil as their default,
+    # would be converted to an empty hash instead of nil
+    it 'should convert a model with nil default fields' do
+      data = {
+        name: nil,
+        date: nil,
+        blah: nil
+      }
+      model = Fixtures::ModelWithNilDefaults.new
+      expect(model.to_h).to eq(data)
+    end
   end
 end

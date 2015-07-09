@@ -85,6 +85,11 @@ module Fixtures
     field :blog, type: 'Fixtures::Blog'
   end
 
+  class ModelWithNilDefaults < Moon::DataModel::Metal
+    field :name, type: String, default: nil
+    field :date, type: String, default: nil
+    field :blah, type: String, default: nil
+  end
   Blog.finalize
   Page.finalize
 end

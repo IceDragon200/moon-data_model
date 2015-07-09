@@ -11,6 +11,8 @@ module Moon
           dump_array(obj, depth + 1)
         when Hash
           dump_hash(obj, depth + 1)
+        when true, false, nil
+          obj
         else
           obj.respond_to?(:to_h) ? obj.to_h : obj
         end
