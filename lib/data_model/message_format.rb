@@ -13,7 +13,7 @@ module Moon
         result = msg.dup
         if ctx
           if k = ctx[:key]
-            result = "key:(#{k.inspect}) #{result}"
+            result = "#{k.inspect} #{result}"
           end
           if p = ctx[:prefix]
             result = "#{prefix}: #{result}"
