@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency             'rake',              '~> 10.3'
   s.add_dependency             'activesupport',     '~> 4.2'
-  s.add_dependency             'moon-safe_copy',    '~> 1.0'
+  s.add_dependency             'moon-maybe_copy',    '~> 1.0'
   s.add_dependency             'moon-serializable', '~> 1.0'
   s.add_dependency             'moon-prototype',    '~> 1.1'
   s.add_development_dependency 'guard',             '~> 2.12'

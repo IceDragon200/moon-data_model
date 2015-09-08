@@ -33,7 +33,7 @@ module Moon
         end
 
         unless (obj = options[:default]).is_a?(Proc)
-          options[:default] = ->(_, _) { obj.safe_dup }
+          options[:default] = ->(_, _) { obj.maybe_dup }
         end
 
         options

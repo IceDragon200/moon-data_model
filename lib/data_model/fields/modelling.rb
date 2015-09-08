@@ -1,6 +1,6 @@
 require 'moon-serializable/load'
 require 'moon-prototype/load'
-require 'moon-safe_copy/load'
+require 'moon-maybe_copy/load'
 require 'data_model/err'
 require 'data_model/field'
 
