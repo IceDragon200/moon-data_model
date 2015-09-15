@@ -50,7 +50,8 @@ module Moon
         # @return [Field]
         def fetch_field(expected_key = nil, &block)
           find_field(expected_key, &block) ||
-            (raise FieldNotFound, "could not find field #{expected_key}.")
+            (raise FieldNotFound,
+              "no such field `#{expected_key}` for #{self}.")
         end
 
         # Field settings are common parameters amongst fields,
