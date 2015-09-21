@@ -43,11 +43,11 @@ module Moon
       def initialize(options)
         @name          = options.fetch(:name)
         initialize_type(options.fetch(:type))
-        @default       = options.fetch(:default, ->(_, _) { nil })
+        @default       = options.fetch(:default) { ->(_, _) { nil } }
         @allow_nil     = options.fetch(:allow_nil, false)
         @coerce_values = options.fetch(:coerce_values, false)
         @is_key        = options.fetch(:is_key, false)
-        initialize_validators(options.fetch(:validate, {}))
+        initialize_validators(options.fetch(:validate) { {} })
       end
 
       # Finalizes the type, this will replace the current {Field#type} with the
