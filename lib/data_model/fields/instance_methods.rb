@@ -115,14 +115,14 @@ module Moon
         end
 
         # Create and return an assoc pair, the first element is the field name
-        # and the second if the value of the field.
+        # and the second is the value of the field.
         #
         # @return [Array[Symbol, Object]] name, value
         def assoc(key)
           [key, field_get(key)]
         end
 
-        # Yields each Field
+        # Yields each {Field} this model has
         #
         # @yieldparam [Symbol] key
         # @yieldparam [Field] field
@@ -150,7 +150,7 @@ module Moon
         end
         alias :each_key :each_field_name
 
-        # Yields each Field, along with its current value on the Model.
+        # Yields each {Field}, along with its current value on the Model.
         #
         # @yieldparam [Symbol] key
         # @yieldparam [Field] field

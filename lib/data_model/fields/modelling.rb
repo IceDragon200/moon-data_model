@@ -85,7 +85,7 @@ module Moon
         #     field_setting type: String
         #
         # A block can be passed in to temporarily use the field_settings within
-        # the blocks context.
+        # the block's context.
         # @example
         #   field_setting type: String do
         #     # all fields declared here will have the type String
