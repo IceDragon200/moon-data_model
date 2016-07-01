@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.authors     = ['Blaž Hrastnik', 'Corey Powell']
 
-  s.add_dependency             'activesupport',     '~> 4.2'
+  s.add_dependency             'activesupport',     ['>= 4.2', '< 6.0']
   s.add_dependency             'moon-maybe_copy',   ['>= 1.1.1', '~> 1.1']
   s.add_dependency             'moon-serializable', ['>= 1.0.1', '~> 1.0']
   s.add_dependency             'moon-prototype',    ['>= 1.1.1', '~> 1.1']
