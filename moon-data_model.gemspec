@@ -1,3 +1,4 @@
+require 'date'
 require_relative 'lib/data_model/version'
 
 Gem::Specification.new do |s|
