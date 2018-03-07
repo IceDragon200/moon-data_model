@@ -4,7 +4,7 @@ require 'data_model/type'
 describe Moon::DataModel::Type do
   it 'should fail to create a nil type' do
     # use NilClass instead
-    expect { described_class[nil] }.to raise_error()
+    expect { described_class[nil] }.to raise_error(Moon::DataModel::InvalidModelType)
   end
 
   it 'should create an incomplete type' do
